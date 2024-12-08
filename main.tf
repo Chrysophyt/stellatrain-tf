@@ -168,7 +168,7 @@ resource "aws_instance" "stella_workers" {
   master_ip    = cidrhost(var.public_subnet_cidr, 10)  # Master IP
   my_ip        = cidrhost(var.private_subnet_cidrs[0], 10 + count.index)
   world_size   = "${var.worker_count + 1}"  # n Worker + 1 Master
-  num_gpus     = "1"
+  num_gpus     = "2"
   rank         = "${count.index + 1}"
   })
 }
@@ -197,7 +197,7 @@ resource "aws_instance" "stella_master" {
     master_ip    = cidrhost(var.public_subnet_cidr, 10) # Master IP
     my_ip        = cidrhost(var.public_subnet_cidr, 10)
     world_size   = "${var.worker_count + 1}"
-    num_gpus     = "1"
+    num_gpus     = "2"
     rank         = "0"
   })
 }
