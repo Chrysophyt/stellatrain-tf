@@ -167,14 +167,14 @@ resource "aws_security_group" "stella_cluster_sg" {
 
 resource "aws_instance" "stella_master" {
   count         = 1
-  ami           = "ami-04dd23e62ed049936"  # AMI is Region specific
+  ami           = "ami-000e04a00165cf1cc"  # Deep Learning Proprietary Nvidia Driver (Amazon Linux 2) 20240606 for P3 support See https://docs.aws.amazon.com/dlami/latest/devguide/important-changes.html
   instance_type = "p3.2xlarge"
   key_name      = aws_key_pair.stella-key-pair.key_name
 
   subnet_id                   = aws_subnet.PublicSubnet.id
   vpc_security_group_ids      = [aws_security_group.ssh_sg.id, aws_security_group.stella_cluster_sg.id]
   associate_public_ip_address = true
-  private_ip = cidrhost(var.public_subnet_cidr, 10 + count.index) # 10.0.0.10 + i
+  private_ip = cidrhost(var.public_subnet_cidr, 10) # 10.0.0.10
 
   tags = {
     Name = "Stella-Master"
@@ -187,9 +187,9 @@ resource "aws_instance" "stella_master" {
 
   user_data = templatefile("${path.module}/scripts/init.sh", {
     master_ip    = cidrhost(var.public_subnet_cidr, 10)        # Assuming master IP is fixed
-    my_ip        = cidrhost(var.public_subnet_cidr, 10 + count.index)
+    my_ip        = cidrhost(var.public_subnet_cidr, 10)
     world_size   = "1"
-    num_gpus     = "2"
-    rank         = count.index + 1
+    num_gpus     = "1"
+    rank         = "0"
   })
 }
