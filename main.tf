@@ -152,7 +152,7 @@ resource "aws_security_group" "stella_cluster_sg" {
 resource "aws_instance" "stella_workers" {
   count         = var.worker_count
   ami           = "ami-000e04a00165cf1cc"  # AMI is Region specific
-  instance_type = "p3.2xlarge"
+  instance_type = var.instance_type
   key_name      = aws_key_pair.stella-key-pair.key_name
 
   subnet_id                   = aws_subnet.PrivateSubnet[0].id
@@ -176,7 +176,7 @@ resource "aws_instance" "stella_workers" {
 resource "aws_instance" "stella_master" {
   count         = 1
   ami           = "ami-000e04a00165cf1cc"  # Deep Learning Proprietary Nvidia Driver (Amazon Linux 2) 20240606 for P3 support See https://docs.aws.amazon.com/dlami/latest/devguide/important-changes.html
-  instance_type = "p3.2xlarge"
+  instance_type = var.instance_type
   key_name      = aws_key_pair.stella-key-pair.key_name
 
   subnet_id                   = aws_subnet.PublicSubnet.id
