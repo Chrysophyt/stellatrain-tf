@@ -47,12 +47,12 @@ When EC2 instances were created, it will first run the `scripts/init.sh`.
 
 We can SSH to the designated node with the generated pem key
 ```bash
-ssh ubuntu@instance-public-ip-here -i stella-key.pem
+ssh ec2-user@instance-public-ip-here -i stella-key.pem -A
 ```
 
 To follow the initialization progress, you can run
 ```bash
-tail -f /var/log/cloud-init-output.log
+sudo tail -f /var/log/cloud-init-output.log
 ```
 
 Once the init script finish, you can attach the created container and run the train command

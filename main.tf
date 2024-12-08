@@ -149,21 +149,29 @@ resource "aws_security_group" "stella_cluster_sg" {
   }
 }
 
-# resource "aws_instance" "stella_workers" {
-#   count         = 0 # Not enough resource sadly
-#   ami           = "ami-04dd23e62ed049936"  # AMI is Region specific
-#   instance_type = "p3.2xlarge"
-#   key_name      = aws_key_pair.stella-key-pair.key_name
+resource "aws_instance" "stella_workers" {
+  count         = var.worker_count
+  ami           = "ami-000e04a00165cf1cc"  # AMI is Region specific
+  instance_type = "p3.2xlarge"
+  key_name      = aws_key_pair.stella-key-pair.key_name
 
-#   subnet_id                   = aws_subnet.PrivateSubnet[0].id
-#   vpc_security_group_ids      = [aws_security_group.ssh_sg.id, aws_security_group.stella_cluster_sg.id]
+  subnet_id                   = aws_subnet.PrivateSubnet[0].id
+  vpc_security_group_ids      = [aws_security_group.ssh_sg.id, aws_security_group.stella_cluster_sg.id]
 
-#   private_ip = cidrhost(var.private_subnet_cidrs[0], 10 + count.index) # 10.2.0.10 + i
+  private_ip = cidrhost(var.private_subnet_cidrs[0], 10 + count.index) # 10.2.0.10 + i
 
-#   tags = {
-#     Name = "Stella-Worker-${count.index}"
-#   }
-# }
+  tags = {
+    Name = "Stella-Worker-${count.index}"
+  }
+
+  user_data = templatefile("${path.module}/scripts/init.sh", {
+  master_ip    = cidrhost(var.public_subnet_cidr, 10)  # Master IP
+  my_ip        = cidrhost(var.private_subnet_cidrs[0], 10 + count.index)
+  world_size   = "${var.worker_count + 1}"  # n Worker + 1 Master
+  num_gpus     = "1"
+  rank         = "${count.index + 1}"
+  })
+}
 
 resource "aws_instance" "stella_master" {
   count         = 1
@@ -186,9 +194,9 @@ resource "aws_instance" "stella_master" {
   }
 
   user_data = templatefile("${path.module}/scripts/init.sh", {
-    master_ip    = cidrhost(var.public_subnet_cidr, 10)        # Assuming master IP is fixed
+    master_ip    = cidrhost(var.public_subnet_cidr, 10) # Master IP
     my_ip        = cidrhost(var.public_subnet_cidr, 10)
-    world_size   = "1"
+    world_size   = "${var.worker_count + 1}"
     num_gpus     = "1"
     rank         = "0"
   })

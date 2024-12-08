@@ -10,12 +10,12 @@ variable "secret_access_key" {
 
 variable "instance_type" {
   type    = string
-  default = "m5.large"
+  default = "p3.2xlarge"
 }
 
-variable "instance_count" {
+variable "worker_count" {
   type    = number
-  default = 4
+  default = 2
 }
 
 variable "region" {
