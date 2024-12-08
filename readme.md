@@ -37,7 +37,7 @@ terraform apply # Create the resources
 The cluster should be created automatically and by default will train on dummy dataset. To connect to the instance, Stella-Master is the main SSH point.
 After accessing the master server, you could access other instance directly by their private IP address.
 
-Onced finished testing, you clean-up everything by running
+After finish testing, you clean-up everything by running
 ```bash
 terraform destroy
 ```
@@ -47,7 +47,14 @@ When EC2 instances were created, it will first run the `scripts/init.sh`.
 
 We can SSH to the designated node with the generated pem key
 ```bash
-ssh ec2-user@instance-public-ip-here -i stella-key.pem -A
+# Pass the rsa key to bastion master
+scp -i stella-key.pem stella-key.pem ec2-user@instance-public-ip-here:~/.ssh/id_rsa
+
+# Connect to master
+ssh ec2-user@instance-public-ip-here -i stella-key.pem
+
+# Then connect to worker
+ssh ec2-user@instance-private-ip-here
 ```
 
 To follow the initialization progress, you can run
