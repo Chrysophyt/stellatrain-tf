@@ -37,6 +37,8 @@ terraform apply # Create the resources
 The cluster should be created automatically and by default will train on dummy dataset. To connect to the instance, Stella-Master is the main SSH point.
 After accessing the master server, you could access other instance directly by their private IP address.
 
+![aws image](img/instance.png)
+
 After finish testing, you clean-up everything by running
 ```bash
 terraform destroy
@@ -73,6 +75,7 @@ stellatrain@ip-10-0-1-10:~/explore-dp$
 ```
 
 Example result:
+
 ![Result image](img/sample.png)
 
 

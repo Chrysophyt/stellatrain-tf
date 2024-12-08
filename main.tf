@@ -12,7 +12,7 @@ resource "aws_subnet" "PublicSubnet" {
   vpc_id = aws_vpc.stella-vpc.id
   cidr_block = "10.0.1.0/24"
   map_public_ip_on_launch = true
-  availability_zone      = var.zones[0]
+  availability_zone      = var.zones[1]
 }
 
 # Create a subnet in each availability zone in the VPC. 
@@ -155,10 +155,10 @@ resource "aws_instance" "stella_workers" {
   instance_type = var.instance_type
   key_name      = aws_key_pair.stella-key-pair.key_name
 
-  subnet_id                   = aws_subnet.PrivateSubnet[0].id
+  subnet_id                   = aws_subnet.PrivateSubnet[1].id
   vpc_security_group_ids      = [aws_security_group.ssh_sg.id, aws_security_group.stella_cluster_sg.id]
 
-  private_ip = cidrhost(var.private_subnet_cidrs[0], 10 + count.index) # 10.2.0.10 + i
+  private_ip = cidrhost(var.private_subnet_cidrs[1], 10 + count.index) # 10.2.0.10 + i
 
   tags = {
     Name = "Stella-Worker-${count.index}"
@@ -166,7 +166,7 @@ resource "aws_instance" "stella_workers" {
 
   user_data = templatefile("${path.module}/scripts/init.sh", {
   master_ip    = cidrhost(var.public_subnet_cidr, 10)  # Master IP
-  my_ip        = cidrhost(var.private_subnet_cidrs[0], 10 + count.index)
+  my_ip        = cidrhost(var.private_subnet_cidrs[1], 10 + count.index)
   world_size   = "${var.worker_count + 1}"  # n Worker + 1 Master
   num_gpus     = "2"
   rank         = "${count.index + 1}"
